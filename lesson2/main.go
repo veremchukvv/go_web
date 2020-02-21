@@ -40,7 +40,7 @@ func main() {
 	})
 
 	router.HandleFunc("/post", func(wr http.ResponseWriter, req *http.Request) {
-		resp, err := http.Post("http://127.0.0.1:8081/get", "application/json", bytes.NewBuffer(reqParamsJSON))
+		resp, err := http.Post("http://127.0.0.1:8080/get", "application/json", bytes.NewBuffer(reqParamsJSON))
 		if err != nil {
 			log.Fatalln(err)
 		}
