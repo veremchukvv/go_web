@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -12,39 +13,43 @@ import (
 
 const (
 	fileParams = "request.json"
+	port       = "8080"
 )
 
 func main() {
-	type reqParams struct {
-		Search string
-		Sites  []string
-	}
-
-	var params reqParams
 	reqParamsJSON, _ := openAndReadFile(fileParams)
-	err := json.Unmarshal(reqParamsJSON, &params)
-	if err != nil {
-		fmt.Println(err)
-	}
-	// fmt.Println(params.Search, params.Sites)
+	router := http.NewServeMux()
 
-	search(params.Search, params.Sites)
+	router.HandleFunc("/get", func(wr http.ResponseWriter, req *http.Request) {
+		type reqParams struct {
+			Search string
+			Sites  []string
+		}
 
-	// router := http.NewServeMux()
+		var params reqParams
+		reqParamsPOST, _ := ioutil.ReadAll(req.Body)
+		err := json.Unmarshal(reqParamsPOST, &params)
+		if err != nil {
+			fmt.Println(err)
+		}
 
-	// port := "8080"
-	// log.Printf("Start listen on port %v", port)
-	// log.Fatal(http.ListenAndServe(":"+port, router))
+		foundingsJSON, _ := search(params.Search, params.Sites)
+		log.Println(string(foundingsJSON))
+		_, _ = wr.Write(foundingsJSON)
 
+	})
+
+	router.HandleFunc("/post", func(wr http.ResponseWriter, req *http.Request) {
+		resp, err := http.Post("http://127.0.0.1:8081/get", "application/json", bytes.NewBuffer(reqParamsJSON))
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer resp.Body.Close()
+	})
+
+	log.Printf("Start listen on port %v", port)
+	log.Fatal(http.ListenAndServe(":"+port, router))
 }
-
-// func reqHandler(wr http.ResponseWriter, req *http.Request) {
-
-// }
-
-// func marshallJSON() {
-
-// }
 
 func openAndReadFile(fileName string) ([]byte, error) {
 	file, err := os.Open(fileName)
@@ -52,11 +57,11 @@ func openAndReadFile(fileName string) ([]byte, error) {
 		return nil, err
 	}
 	return ioutil.ReadAll(file)
-
 }
 
-func search(searchString string, searchPages []string) (foundings []string, err error) {
+func search(searchString string, searchPages []string) (foundingsJSON []byte, err error) {
 	var getBodies = make(map[string]string)
+	var foundings []string
 
 	for i := range searchPages {
 		resp, err := http.Get(searchPages[i])
@@ -78,8 +83,9 @@ func search(searchString string, searchPages []string) (foundings []string, err 
 		if strings.Contains(value, searchString) {
 			foundings = append(foundings, key)
 		}
-	}
-	log.Println(foundings)
-	return
 
+	}
+	foundingsJSON, _ = json.Marshal(foundings)
+
+	return
 }
