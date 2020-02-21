@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 const (
@@ -45,6 +46,22 @@ func main() {
 			log.Fatalln(err)
 		}
 		defer resp.Body.Close()
+	})
+
+	router.HandleFunc("/", func(wr http.ResponseWriter, req *http.Request) {
+		http.SetCookie(wr, &http.Cookie{
+			Name:    "Vladimir",
+			Expires: time.Now().Add(time.Minute * 10),
+		})
+	})
+
+	router.HandleFunc("/cookie", func(wr http.ResponseWriter, req *http.Request) {
+		cookie, err := req.Cookie("Vladimir")
+		if err != nil {
+			fmt.Println(err.Error())
+		} else {
+			fmt.Println(cookie.Name, cookie.Value)
+		}
 	})
 
 	log.Printf("Start listen on port %v", port)
