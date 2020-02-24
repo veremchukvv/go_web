@@ -1,0 +1,27 @@
+{{define "Blog"}}
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8"> 
+    <title>{{.Title}}</title>
+  </head>
+  <body>
+    <article>
+      <header>
+        <ul>
+        {{range .PostList}}
+        {{template "PostItem" .}}
+        {{end}}
+        </ul>
+      </header>
+    </article>
+  </body>
+</html>
+{{end}}
+
+{{define "PostItem"}}
+<li>
+    <h1>{{.PostName}}</h1>
+    <p>{{.PostAuthor}}</p>
+</li>
+{{end}}
