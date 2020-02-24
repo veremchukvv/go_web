@@ -18,7 +18,10 @@ const (
 )
 
 func main() {
-	reqParamsJSON, _ := openAndReadFile(fileParams)
+	reqParamsJSON, err := openAndReadFile(fileParams)
+	if err != nil {
+		log.Println(err)
+	}
 	router := http.NewServeMux()
 
 	router.HandleFunc("/get", func(wr http.ResponseWriter, req *http.Request) {
@@ -28,13 +31,22 @@ func main() {
 		}
 
 		var params reqParams
-		reqParamsPOST, _ := ioutil.ReadAll(req.Body)
-		err := json.Unmarshal(reqParamsPOST, &params)
+
+		reqParamsPOST, err := ioutil.ReadAll(req.Body)
+		if err != nil {
+			fmt.Println(err)
+		}
+		err = json.Unmarshal(reqParamsPOST, &params)
+		if err != nil {
+			http.Error(wr, "can't read parameters from POST request", http.StatusInternalServerError)
+			return
+		}
+
+		foundingsJSON, err := search(params.Search, params.Sites)
 		if err != nil {
 			fmt.Println(err)
 		}
 
-		foundingsJSON, _ := search(params.Search, params.Sites)
 		log.Println(string(foundingsJSON))
 		_, _ = wr.Write(foundingsJSON)
 
