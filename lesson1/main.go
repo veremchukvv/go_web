@@ -12,27 +12,34 @@ const reqString = "noindex"
 var pages = []string{"https://www.google.com", "https://www.yandex.ru", "https://www.rambler.ru"}
 
 func main() {
-	search(reqString, pages)
+	foundings, errs, err := search(reqString, pages)
+	if err != nil {
+		log.Println(err)
+	}
+	log.Println(foundings)
+	log.Println("number of errors:", errs)
+	return
 }
 
-func search(searchString string, searchPages []string) (foundings []string, err error) {
-
+func search(searchString string, searchPages []string) (foundings []string, errs int, err error) {
 	var getBodies = make(map[string]string)
+	errs = 0
 
 	for i := range searchPages {
 		resp, err := http.Get(searchPages[i])
 		if err != nil {
-			return nil, err
+			errs++
+			log.Print(err)
+			continue
 		}
 		defer resp.Body.Close()
 
 		bodyBytes, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return nil, err
+			return nil, errs, err
 		}
 
-		BodyString := string(bodyBytes)
-		getBodies[searchPages[i]] = BodyString
+		getBodies[searchPages[i]] = string(bodyBytes)
 	}
 
 	for key, value := range getBodies {
@@ -40,7 +47,5 @@ func search(searchString string, searchPages []string) (foundings []string, err 
 			foundings = append(foundings, key)
 		}
 	}
-	log.Println(foundings)
 	return
-
 }
