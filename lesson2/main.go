@@ -42,10 +42,12 @@ func main() {
 			return
 		}
 
-		foundingsJSON, err := search(params.Search, params.Sites)
+		foundings, err := search(params.Search, params.Sites)
 		if err != nil {
 			fmt.Println(err)
 		}
+
+		foundingsJSON, _ := json.Marshal(foundings)
 
 		log.Println(string(foundingsJSON))
 		_, _ = wr.Write(foundingsJSON)
@@ -55,7 +57,7 @@ func main() {
 	router.HandleFunc("/post", func(wr http.ResponseWriter, req *http.Request) {
 		resp, err := http.Post("http://127.0.0.1:8080/get", "application/json", bytes.NewBuffer(reqParamsJSON))
 		if err != nil {
-			log.Fatalln(err)
+			fmt.Println(err)
 		}
 		defer resp.Body.Close()
 	})
@@ -88,9 +90,8 @@ func openAndReadFile(fileName string) ([]byte, error) {
 	return ioutil.ReadAll(file)
 }
 
-func search(searchString string, searchPages []string) (foundingsJSON []byte, err error) {
+func search(searchString string, searchPages []string) (foundings []string, err error) {
 	var getBodies = make(map[string]string)
-	var foundings []string
 
 	for i := range searchPages {
 		resp, err := http.Get(searchPages[i])
@@ -112,9 +113,7 @@ func search(searchString string, searchPages []string) (foundingsJSON []byte, er
 		if strings.Contains(value, searchString) {
 			foundings = append(foundings, key)
 		}
-
 	}
-	foundingsJSON, _ = json.Marshal(foundings)
 
 	return
 }
