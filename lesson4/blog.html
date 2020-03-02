@@ -1,0 +1,26 @@
+{{define "Blog"}}
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8"> 
+    <title>БЛОГ</title>
+  </head>
+  <body>
+    <article>
+      <header>
+        <ul>
+          {{range .}}
+          <li>
+            <h1>{{.ID}}</h1>
+              <h1>{{.Title}}</h1>
+              <p>{{.Author}}</p>
+              <p>{{.Category}}</p>
+              <p>{{.Text}}</p>
+          </li>
+          {{end}}
+        </ul>
+      </header>
+    </article>
+  </body>
+</html>
+{{end}}
