@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"net/http"
@@ -49,7 +50,7 @@ func main() {
 	router := http.NewServeMux()
 
 	router.HandleFunc("/", s.viewAllPostsForMain)
-	// router.HandleFunc("/post", s.viewOnePost)
+	router.HandleFunc("/post", s.viewOnePost)
 	// router.HandleFunc("/edit", s.editPost)
 
 	log.Printf("server start at port: %v", port)
@@ -58,7 +59,7 @@ func main() {
 
 func (server *Server) viewAllPostsForMain(wr http.ResponseWriter, r *http.Request) {
 	posts, err := getAllPosts(server.db)
-	log.Println(posts)
+
 	if err != nil {
 		log.Print(err)
 		wr.WriteHeader(500)
@@ -70,18 +71,18 @@ func (server *Server) viewAllPostsForMain(wr http.ResponseWriter, r *http.Reques
 	}
 }
 
-// func (server *Server) viewOnePost(wr http.ResponseWriter, r *http.Request) {
-// 	post, err := getOnePost(server.db, r.URL.Query().Get("id"))
-// 	if err != nil {
-// 		log.Print(err)
-// 		wr.WriteHeader(404)
-// 		return
-// 	}
+func (server *Server) viewOnePost(wr http.ResponseWriter, r *http.Request) {
+	post, err := getOnePost(server.db, r.URL.Query().Get("id"))
+	if err != nil {
+		log.Print(err)
+		wr.WriteHeader(404)
+		return
+	}
 
-// 	if err := tmplPost.ExecuteTemplate(wr, "Post", post); err != nil {
-// 		log.Println(err)
-// 	}
-// }
+	if err := tmplPost.ExecuteTemplate(wr, "Post", post); err != nil {
+		log.Println(err)
+	}
+}
 
 func getAllPosts(db *sql.DB) ([]Post, error) {
 	res := make([]Post, 0, 1)
@@ -93,7 +94,7 @@ func getAllPosts(db *sql.DB) ([]Post, error) {
 
 	for rows.Next() {
 		blog := Post{}
-		if err := rows.Scan(&blog.ID, &blog.Title, &blog.Author, &blog.Category, &blog.Text); err != nil {
+		if err := rows.Scan(&blog.ID, &blog.Category, &blog.Title, &blog.Author, &blog.Text); err != nil {
 			log.Println(err)
 			continue
 		}
@@ -103,6 +104,22 @@ func getAllPosts(db *sql.DB) ([]Post, error) {
 	return res, nil
 }
 
-// func getOnePost(db *sql.DB, id string) ([]PostPage, error) {
-// 	return
-// }
+func getOnePost(db *sql.DB, id string) ([]Post, error) {
+	res := make([]Post, 0, 1)
+	rows, err := db.Query(fmt.Sprintf("select * from blog_app.posts WHERE ID= %v", id))
+	if err != nil {
+		return res, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		post := Post{}
+		if err := rows.Scan(&post.ID, &post.Category, &post.Title, &post.Author, &post.Text); err != nil {
+			log.Println(err)
+			continue
+		}
+		res = append(res, post)
+	}
+
+	return res, nil
+}

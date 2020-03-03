@@ -11,11 +11,9 @@
         <ul>
           {{range .}}
           <li>
-            <h1>{{.ID}}</h1>
-              <h1>{{.Title}}</h1>
-              <p>{{.Author}}</p>
-              <p>{{.Category}}</p>
-              <p>{{.Text}}</p>
+              <h1><a href="/post?id={{.ID}}">{{.Title}}</a></h1>
+              <p>Автор: {{.Author}}</p>
+              <p>Категория поста: {{.Category}}</p>
           </li>
           {{end}}
         </ul>
