@@ -1,0 +1,25 @@
+{{define "Edit"}}
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8"> 
+  </head>
+  <body>
+<div class="container">
+    <div class="post">
+        <div class="post-image">
+        </div>
+        <div class="post-content">
+                {{range .}}
+                <p> <input type="text" placeholder="{{.Title}}">  </p>
+                <p> <input type="text" placeholder="{{.Author}}">  </p>
+                 <p> <input type="text" placeholder="{{.Category}}">  </p>
+            <p><input type="text" placeholder="{{.Text}}">  </p>
+            <p><a href="/post/edit?id={{.ID}}">Сохранить</a></p>
+        </div>
+    </div>
+</div>
+{{end}}
+</body>
+</html>
+{{end}}

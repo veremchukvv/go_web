@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"text/template"
@@ -28,6 +29,7 @@ type Post struct {
 
 var tmplBlog = template.Must(template.New("MyBlogTemplate").ParseFiles("blog.html"))
 var tmplPost = template.Must(template.New("MyPostTemplate").ParseFiles("post.html"))
+var tmplEdit = template.Must(template.New("MyEditTemplate").ParseFiles("edit.html"))
 
 func main() {
 	db, err := sql.Open("mysql", DSN)
@@ -47,11 +49,11 @@ func main() {
 		log.Println("Database connection OK")
 	}
 
-	router := http.NewServeMux()
+	router := mux.NewRouter()
 
 	router.HandleFunc("/", s.viewAllPostsForMain)
 	router.HandleFunc("/post", s.viewOnePost)
-	// router.HandleFunc("/edit", s.editPost)
+	router.HandleFunc("/post/edit/{id:[0-9]+}", s.editPost)
 
 	log.Printf("server start at port: %v", port)
 	log.Fatal(http.ListenAndServe(":"+port, router))
@@ -84,6 +86,23 @@ func (server *Server) viewOnePost(wr http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (server *Server) editPost(wr http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	id := vars["id"]
+	post, err := getOnePost(server.db, id)
+	if err != nil {
+		log.Print(err)
+		wr.WriteHeader(404)
+		return
+	}
+
+	if err := tmplEdit.ExecuteTemplate(wr, "Edit", post); err != nil {
+		log.Println(err)
+
+	}
+}
+
 func getAllPosts(db *sql.DB) ([]Post, error) {
 	res := make([]Post, 0, 1)
 	rows, err := db.Query("select * from blog_app.posts")
@@ -105,6 +124,26 @@ func getAllPosts(db *sql.DB) ([]Post, error) {
 }
 
 func getOnePost(db *sql.DB, id string) ([]Post, error) {
+	res := make([]Post, 0, 1)
+	rows, err := db.Query(fmt.Sprintf("select * from blog_app.posts WHERE ID= %v", id))
+	if err != nil {
+		return res, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		post := Post{}
+		if err := rows.Scan(&post.ID, &post.Category, &post.Title, &post.Author, &post.Text); err != nil {
+			log.Println(err)
+			continue
+		}
+		res = append(res, post)
+	}
+
+	return res, nil
+}
+
+func getPostForEdit(db *sql.DB, id string) ([]Post, error) {
 	res := make([]Post, 0, 1)
 	rows, err := db.Query(fmt.Sprintf("select * from blog_app.posts WHERE ID= %v", id))
 	if err != nil {
