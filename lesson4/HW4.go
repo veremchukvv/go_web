@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"strconv"
 	"text/template"
 )
 
@@ -55,7 +56,7 @@ func main() {
 	router.HandleFunc("/", s.viewAllPostsForMain)
 	router.HandleFunc("/post", s.viewOnePost)
 	router.HandleFunc("/post/edit/{id:[0-9]+}", s.editPost)
-	router.HandleFunc("/post/edit/{id:[0-9]+}/save", s.savePost)
+	// router.HandleFunc("/post/edit/{id:[0-9]+}/save", s.savePost)
 	router.HandleFunc("/post/new", s.newPost)
 
 	log.Printf("server start at port: %v", port)
@@ -100,39 +101,35 @@ func (server *Server) editPost(wr http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := tmplEdit.ExecuteTemplate(wr, "Edit", post); err != nil {
-		log.Println(err)
+	if r.Method == "GET" {
+		if err := tmplEdit.ExecuteTemplate(wr, "Edit", post); err != nil {
+			log.Println(err)
 
+		}
 	}
-}
 
-func (server *Server) savePost(wr http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		err := r.ParseForm()
+		if err != nil {
+			log.Println(err)
+		}
 
-	// vars := mux.Vars(r)
-	log.Println(r)
-	// id := vars["id"]
-	// post, err := getOnePost(server.db, id)
-	// log.Println(post)
-	// if err != nil {
-	// 	log.Print(err)
-	// 	wr.WriteHeader(404)
-	// 	return
-	// }
+		id, err := strconv.Atoi(id)
+		title := r.FormValue("title")
+		author := r.FormValue("author")
+		category := r.FormValue("category")
+		text := r.FormValue("text")
 
-	// if err := tmplEdit.ExecuteTemplate(wr, "Edit", post); err != nil {
-	// 	log.Println(err)
+		_, err = database.Exec("update blog_app.posts set category_id=?, title=?, author=?, text=? where id = ?", category, title, author, text, id)
+		if err != nil {
+			log.Println(err)
+		}
+		http.Redirect(wr, r, "/", 301)
+	}
 
-	// }
 }
 
 func (server *Server) newPost(wr http.ResponseWriter, r *http.Request) {
-
-	// post, err := newPost(server.db)
-	// if err != nil {
-	// 	log.Print(err)
-	// 	wr.WriteHeader(500)
-	// 	return
-	// }
 
 	post := Post{
 		ID:       1,
@@ -225,23 +222,3 @@ func getPostForEdit(db *sql.DB, id string) ([]Post, error) {
 
 	return res, nil
 }
-
-// func newPost(db *sql.DB) ([]Post, error) {
-// 	res := make([]Post, 0, 1)
-// 	rows, err := db.Query(fmt.Sprintf("select * from blog_app.posts WHERE ID= %v", id))
-// 	if err != nil {
-// 		return res, err
-// 	}
-// 	defer rows.Close()
-
-// 	for rows.Next() {
-// 		post := Post{}
-// 		if err := rows.Scan(&post.ID, &post.Category, &post.Title, &post.Author, &post.Text); err != nil {
-// 			log.Println(err)
-// 			continue
-// 		}
-// 		res = append(res, post)
-// 	}
-
-// 	return res, nil
-// }
