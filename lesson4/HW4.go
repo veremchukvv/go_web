@@ -30,6 +30,7 @@ type Post struct {
 var tmplBlog = template.Must(template.New("MyBlogTemplate").ParseFiles("blog.html"))
 var tmplPost = template.Must(template.New("MyPostTemplate").ParseFiles("post.html"))
 var tmplEdit = template.Must(template.New("MyEditTemplate").ParseFiles("edit.html"))
+var tmplNew = template.Must(template.New("MyNewTemplate").ParseFiles("new.html"))
 
 func main() {
 	db, err := sql.Open("mysql", DSN)
@@ -54,6 +55,7 @@ func main() {
 	router.HandleFunc("/", s.viewAllPostsForMain)
 	router.HandleFunc("/post", s.viewOnePost)
 	router.HandleFunc("/post/edit/{id:[0-9]+}", s.editPost)
+	router.HandleFunc("/post/new", s.newPost)
 
 	log.Printf("server start at port: %v", port)
 	log.Fatal(http.ListenAndServe(":"+port, router))
@@ -91,6 +93,7 @@ func (server *Server) editPost(wr http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	post, err := getOnePost(server.db, id)
+	log.Println(post)
 	if err != nil {
 		log.Print(err)
 		wr.WriteHeader(404)
@@ -98,6 +101,29 @@ func (server *Server) editPost(wr http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := tmplEdit.ExecuteTemplate(wr, "Edit", post); err != nil {
+		log.Println(err)
+
+	}
+}
+
+func (server *Server) newPost(wr http.ResponseWriter, r *http.Request) {
+
+	// post, err := newPost(server.db)
+	// if err != nil {
+	// 	log.Print(err)
+	// 	wr.WriteHeader(500)
+	// 	return
+	// }
+
+	post := Post{
+		ID:       1,
+		Title:    "Введите название статьи",
+		Author:   "Введите имя автора",
+		Category: "Введите категорию",
+		Text:     "Введите текст поста",
+	}
+
+	if err := tmplNew.ExecuteTemplate(wr, "New", post); err != nil {
 		log.Println(err)
 
 	}
@@ -162,3 +188,23 @@ func getPostForEdit(db *sql.DB, id string) ([]Post, error) {
 
 	return res, nil
 }
+
+// func newPost(db *sql.DB) ([]Post, error) {
+// 	res := make([]Post, 0, 1)
+// 	rows, err := db.Query(fmt.Sprintf("select * from blog_app.posts WHERE ID= %v", id))
+// 	if err != nil {
+// 		return res, err
+// 	}
+// 	defer rows.Close()
+
+// 	for rows.Next() {
+// 		post := Post{}
+// 		if err := rows.Scan(&post.ID, &post.Category, &post.Title, &post.Author, &post.Text); err != nil {
+// 			log.Println(err)
+// 			continue
+// 		}
+// 		res = append(res, post)
+// 	}
+
+// 	return res, nil
+// }

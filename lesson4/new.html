@@ -1,0 +1,23 @@
+{{define "New"}}
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8"> 
+  </head>
+  <body>
+<div class="container">
+    <div class="post">
+        <div class="post-image">
+        </div>
+        <div class="post-content">
+                <p> <input type="text" placeholder="{{.Title}}">  </p>
+                <p> <input type="text" placeholder="{{.Author}}">  </p>
+                 <p> <input type="text" placeholder="{{.Category}}">  </p>
+            <p><input type="text" placeholder="{{.Text}}">  </p>
+            <p><a href="/post/new/save">Сохранить</a></p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+{{end}}
