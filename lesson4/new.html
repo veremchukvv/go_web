@@ -10,11 +10,17 @@
         <div class="post-image">
         </div>
         <div class="post-content">
-                <p> <input type="text" placeholder="{{.Title}}">  </p>
-                <p> <input type="text" placeholder="{{.Author}}">  </p>
-                 <p> <input type="text" placeholder="{{.Category}}">  </p>
-            <p><input type="text" placeholder="{{.Text}}">  </p>
-            <p><a href="/post/new/save">Сохранить</a></p>
+            <form method="POST">
+                <label>Title</label><br>
+                <input type="text" name="title" /><br><br>
+                <label>Author</label><br>
+                <input type="text" name="author" /><br><br>
+                <label>Category</label><br>
+                <input type="text" name="category" /><br><br>
+                <label>Text</label><br>
+                <input type="text" name="text" /><br><br>
+                <input type="submit" value="Сохранить" />
+            </form>
         </div>
     </div>
 </div>

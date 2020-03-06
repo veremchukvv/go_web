@@ -55,6 +55,7 @@ func main() {
 	router.HandleFunc("/", s.viewAllPostsForMain)
 	router.HandleFunc("/post", s.viewOnePost)
 	router.HandleFunc("/post/edit/{id:[0-9]+}", s.editPost)
+	router.HandleFunc("/post/edit/{id:[0-9]+}/save", s.savePost)
 	router.HandleFunc("/post/new", s.newPost)
 
 	log.Printf("server start at port: %v", port)
@@ -93,7 +94,6 @@ func (server *Server) editPost(wr http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	post, err := getOnePost(server.db, id)
-	log.Println(post)
 	if err != nil {
 		log.Print(err)
 		wr.WriteHeader(404)
@@ -104,6 +104,25 @@ func (server *Server) editPost(wr http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 
 	}
+}
+
+func (server *Server) savePost(wr http.ResponseWriter, r *http.Request) {
+
+	// vars := mux.Vars(r)
+	log.Println(r)
+	// id := vars["id"]
+	// post, err := getOnePost(server.db, id)
+	// log.Println(post)
+	// if err != nil {
+	// 	log.Print(err)
+	// 	wr.WriteHeader(404)
+	// 	return
+	// }
+
+	// if err := tmplEdit.ExecuteTemplate(wr, "Edit", post); err != nil {
+	// 	log.Println(err)
+
+	// }
 }
 
 func (server *Server) newPost(wr http.ResponseWriter, r *http.Request) {
@@ -123,9 +142,27 @@ func (server *Server) newPost(wr http.ResponseWriter, r *http.Request) {
 		Text:     "Введите текст поста",
 	}
 
-	if err := tmplNew.ExecuteTemplate(wr, "New", post); err != nil {
-		log.Println(err)
+	if r.Method == "GET" {
+		if err := tmplNew.ExecuteTemplate(wr, "New", post); err != nil {
+			log.Println(err)
+		}
+	}
 
+	if r.Method == "POST" {
+		err := r.ParseForm()
+		if err != nil {
+			log.Println(err)
+		}
+		title := r.FormValue("title")
+		author := r.FormValue("author")
+		category := r.FormValue("category")
+		text := r.FormValue("text")
+
+		_, err = database.Exec("insert into blog_app.posts (category_id, title, author, text) values (?, ?, ?, ?)", category, title, author, text)
+		if err != nil {
+			log.Println(err)
+		}
+		http.Redirect(wr, r, "/", 301)
 	}
 }
 
