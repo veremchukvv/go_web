@@ -56,7 +56,7 @@ func main() {
 	router.HandleFunc("/", s.viewAllPostsForMain)
 	router.HandleFunc("/post", s.viewOnePost)
 	router.HandleFunc("/post/edit/{id:[0-9]+}", s.editPost)
-	// router.HandleFunc("/post/edit/{id:[0-9]+}/save", s.savePost)
+	router.HandleFunc("/post/delete/{id:[0-9]+}", s.deletePost)
 	router.HandleFunc("/post/new", s.newPost)
 
 	log.Printf("server start at port: %v", port)
@@ -127,6 +127,18 @@ func (server *Server) editPost(wr http.ResponseWriter, r *http.Request) {
 		http.Redirect(wr, r, "/", 301)
 	}
 
+}
+
+func (server *Server) deletePost(wr http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	idStr := vars["id"]
+	id, err := strconv.Atoi(idStr)
+	_, err = database.Exec("delete from blog_app.posts where id = ?", id)
+	if err != nil {
+		log.Println(err)
+	}
+	http.Redirect(wr, r, "/", 301)
 }
 
 func (server *Server) newPost(wr http.ResponseWriter, r *http.Request) {
