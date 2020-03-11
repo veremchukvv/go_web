@@ -11,15 +11,6 @@ import (
 	"text/template"
 )
 
-var database *sql.DB
-var DSN = "root:1234@tcp(localhost:3306)/blog_app?charset=utf8"
-
-const port = "8080"
-
-type Server struct {
-	db *sql.DB
-}
-
 type Post struct {
 	ID       int
 	Title    string
@@ -28,18 +19,25 @@ type Post struct {
 	Text     string
 }
 
+type Server struct {
+	db *sql.DB
+}
+
 var tmplBlog = template.Must(template.New("MyBlogTemplate").ParseFiles("blog.html"))
 var tmplPost = template.Must(template.New("MyPostTemplate").ParseFiles("post.html"))
 var tmplEdit = template.Must(template.New("MyEditTemplate").ParseFiles("edit.html"))
 var tmplNew = template.Must(template.New("MyNewTemplate").ParseFiles("new.html"))
 
 func main() {
+	var DSN = "root:1234@tcp(localhost:3306)/blog_app?charset=utf8"
+	const port = "8080"
+
 	db, err := sql.Open("mysql", DSN)
 	if err != nil {
 		log.Fatal(err)
 	}
-	database = db
-	defer database.Close()
+
+	defer db.Close()
 
 	s := Server{
 		db: db,
@@ -91,9 +89,9 @@ func (server *Server) viewOnePost(wr http.ResponseWriter, r *http.Request) {
 }
 
 func (server *Server) editPost(wr http.ResponseWriter, r *http.Request) {
-
 	vars := mux.Vars(r)
 	id := vars["id"]
+
 	post, err := getOnePost(server.db, id)
 	if err != nil {
 		log.Print(err)
@@ -112,6 +110,7 @@ func (server *Server) editPost(wr http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		if err != nil {
 			log.Println(err)
+			return
 		}
 
 		id, err := strconv.Atoi(id)
@@ -120,7 +119,7 @@ func (server *Server) editPost(wr http.ResponseWriter, r *http.Request) {
 		category := r.FormValue("category")
 		text := r.FormValue("text")
 
-		_, err = database.Exec("update blog_app.posts set category_id=?, title=?, author=?, text=? where id = ?", category, title, author, text, id)
+		_, err = server.db.Exec("update blog_app.posts set category_id=?, title=?, author=?, text=? where id = ?", category, title, author, text, id)
 		if err != nil {
 			log.Println(err)
 		}
@@ -130,11 +129,14 @@ func (server *Server) editPost(wr http.ResponseWriter, r *http.Request) {
 }
 
 func (server *Server) deletePost(wr http.ResponseWriter, r *http.Request) {
-
 	vars := mux.Vars(r)
 	idStr := vars["id"]
 	id, err := strconv.Atoi(idStr)
-	_, err = database.Exec("delete from blog_app.posts where id = ?", id)
+	if err != nil {
+		log.Println(err)
+	}
+
+	_, err = server.db.Exec("delete from blog_app.posts where id = ?", id)
 	if err != nil {
 		log.Println(err)
 	}
@@ -155,19 +157,21 @@ func (server *Server) newPost(wr http.ResponseWriter, r *http.Request) {
 		if err := tmplNew.ExecuteTemplate(wr, "New", post); err != nil {
 			log.Println(err)
 		}
+		return
 	}
 
 	if r.Method == "POST" {
 		err := r.ParseForm()
 		if err != nil {
 			log.Println(err)
+			return
 		}
 		title := r.FormValue("title")
 		author := r.FormValue("author")
 		category := r.FormValue("category")
 		text := r.FormValue("text")
 
-		_, err = database.Exec("insert into blog_app.posts (category_id, title, author, text) values (?, ?, ?, ?)", category, title, author, text)
+		_, err = server.db.Exec("insert into blog_app.posts (category_id, title, author, text) values (?, ?, ?, ?)", category, title, author, text)
 		if err != nil {
 			log.Println(err)
 		}
