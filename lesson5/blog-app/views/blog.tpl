@@ -8,11 +8,11 @@
     <article>
       <header>
         <ul>
-          {{range .}}
+          {{range $id, $item := .Post}}
           <li>
-               <h1><a href="/post?id={{.ID}}">{{.Title}}</a></h1>
-              <p>Автор: {{.Author}}</p>
-              <p>Категория поста: {{.Category}}</p>
+               <h1><a href="/post?id={{$item.ID}}">{{$item.Title}}</a></h1>
+              <p>Автор: {{$item.Author}}</p>
+              <p>Категория поста: {{$item.Category}}</p>
           </li>
           {{end}}
         </ul>

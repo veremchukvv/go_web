@@ -20,6 +20,7 @@ func (blog *BlogController) Get() {
 		return
 	}
 
+	log.Println(posts)
 	blog.Data["Post"] = posts
 	blog.TplName = "blog.tpl"
 
