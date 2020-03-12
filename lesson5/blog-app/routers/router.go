@@ -21,14 +21,13 @@ func init() {
 		log.Println("Database connection OK")
 	}
 
-	// router.HandleFunc("/", s.viewAllPostsForMain)
 	beego.Router("/", &controllers.BlogController{
 		Controller: beego.Controller{},
 		Db:         db,
 	})
 
 	// router.HandleFunc("/post", s.viewOnePost)
-	beego.Router("/post", &controllers.BlogController{
+	beego.Router("/post", &controllers.PostController{
 		Controller: beego.Controller{},
 		Db:         db,
 	})

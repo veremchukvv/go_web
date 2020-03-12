@@ -1,4 +1,3 @@
-{{define "Post"}}
 <!DOCTYPE html>
 <html lang="ru">
   <head>
@@ -11,20 +10,19 @@
         </div>
         <div class="post-content">
             <div class="post-header">
-                {{range .}}
-                <h1>{{.Title}}</h1>
+           {{range $id, $item := .Post}}
+                <h1>{{$item.Title}}</h1>
                 <div class="post-meta">
-                    <span class="author">Автор: {{.Author}}</span>
-                    <span class="category">Категория: {{.Category}}</span>
+                    <span class="author">Автор: {{$item.Author}}</span>
+                    <span class="category">Категория: {{$item.Category}}</span>
                 </div>
             </div>
-            <p>{{.Text}}
+            <p>{{$item.Text}}
             </p>
-            <p><a href="/post/edit/{{.ID}}">Изменить</a></p>
+            <p><a href="/post/edit/{{$item.ID}}">Изменить</a></p>
         </div>
     </div>
 </div>
 {{end}}
 </body>
 </html>
-{{end}}

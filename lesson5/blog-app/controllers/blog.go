@@ -13,6 +13,7 @@ type BlogController struct {
 }
 
 func (blog *BlogController) Get() {
+
 	posts, err := getAllPosts(blog.Db)
 
 	if err != nil {
@@ -20,7 +21,6 @@ func (blog *BlogController) Get() {
 		return
 	}
 
-	log.Println(posts)
 	blog.Data["Post"] = posts
 	blog.TplName = "blog.tpl"
 
