@@ -1,4 +1,3 @@
-{{define "New"}}
 <!DOCTYPE html>
 <html lang="ru">
   <head>
@@ -26,4 +25,3 @@
 </div>
 </body>
 </html>
-{{end}}

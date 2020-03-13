@@ -36,16 +36,15 @@ func init() {
 		Db:         db,
 	})
 
-	// // router.HandleFunc("/post/new", s.newPost)
-	// beego.Router("/post/edit/new", &controllers.NewController{
-	// 	Controller: beego.Controller{},
-	// 	Db:         db,
-	// })
-
-	// router.HandleFunc("/post/delete", s.deletePost)
-	beego.Router("/post/delete/{id:[0-9]+}", &controllers.PostController{
+	beego.Router("/post/new", &controllers.NewController{
 		Controller: beego.Controller{},
 		Db:         db,
 	})
+
+	// router.HandleFunc("/post/delete", s.deletePost)
+	// beego.Router("/post/delete/{id:[0-9]+}", &controllers.PostController{
+	// 	Controller: beego.Controller{},
+	// 	Db:         db,
+	// })
 
 }
