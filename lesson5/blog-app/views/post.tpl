@@ -19,7 +19,7 @@
             </div>
             <p>{{$item.Text}}
             </p>
-            <p><a href="/post/edit/{{$item.ID}}">Изменить</a></p>
+            <p><a href="/post/edit?id={{$item.ID}}">Изменить</a></p>
         </div>
     </div>
 </div>

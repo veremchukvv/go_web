@@ -26,26 +26,24 @@ func init() {
 		Db:         db,
 	})
 
-	// router.HandleFunc("/post", s.viewOnePost)
 	beego.Router("/post", &controllers.PostController{
 		Controller: beego.Controller{},
 		Db:         db,
 	})
 
-	// router.HandleFunc("/post/edit/{id:[0-9]+}", s.editPost)
-	beego.Router("/post/edit/{id:[0-9]+}", &controllers.BlogController{
+	beego.Router("/post/edit/", &controllers.EditController{
 		Controller: beego.Controller{},
 		Db:         db,
 	})
 
-	// router.HandleFunc("/post/new", s.newPost)
-	beego.Router("/post/edit/new", &controllers.BlogController{
-		Controller: beego.Controller{},
-		Db:         db,
-	})
+	// // router.HandleFunc("/post/new", s.newPost)
+	// beego.Router("/post/edit/new", &controllers.NewController{
+	// 	Controller: beego.Controller{},
+	// 	Db:         db,
+	// })
 
 	// router.HandleFunc("/post/delete", s.deletePost)
-	beego.Router("/post/delete/{id:[0-9]+}", &controllers.BlogController{
+	beego.Router("/post/delete/{id:[0-9]+}", &controllers.PostController{
 		Controller: beego.Controller{},
 		Db:         db,
 	})
