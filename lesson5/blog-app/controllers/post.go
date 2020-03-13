@@ -6,8 +6,6 @@ import (
 	"github.com/astaxie/beego"
 	"go_web/lesson5/blog-app/models"
 	"log"
-	// "net/http"
-	// "strconv"
 )
 
 type PostController struct {

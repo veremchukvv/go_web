@@ -41,10 +41,9 @@ func init() {
 		Db:         db,
 	})
 
-	// router.HandleFunc("/post/delete", s.deletePost)
-	// beego.Router("/post/delete/{id:[0-9]+}", &controllers.PostController{
-	// 	Controller: beego.Controller{},
-	// 	Db:         db,
-	// })
+	beego.Router("/post/delete/", &controllers.DeleteController{
+		Controller: beego.Controller{},
+		Db:         db,
+	})
 
 }

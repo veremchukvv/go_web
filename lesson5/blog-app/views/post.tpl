@@ -20,6 +20,7 @@
             <p>{{$item.Text}}
             </p>
             <p><a href="/post/edit?id={{$item.ID}}">Изменить</a></p>
+            <p><a href="/post/delete?id={{$item.ID}}">Удалить</a></p>
         </div>
     </div>
 </div>
