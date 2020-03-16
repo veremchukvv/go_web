@@ -3,7 +3,6 @@ package controllers
 import (
 	"database/sql"
 	"github.com/astaxie/beego"
-	"go_web/lesson5/blog-app/models"
 	"log"
 )
 
@@ -13,24 +12,10 @@ type NewController struct {
 }
 
 func (post *NewController) Get() {
-
-	newPost := models.Post{
-		ID:       1,
-		Title:    "Введите название статьи",
-		Author:   "Введите имя автора",
-		Category: "Введите категорию",
-		Text:     "Введите текст поста",
-	}
-
-	log.Println(newPost)
-
-	post.Data["Post"] = newPost
 	post.TplName = "new.tpl"
-
 }
 
 func (post *NewController) Post() {
-
 	title := post.GetString("title")
 	author := post.GetString("author")
 	category := post.GetString("category")

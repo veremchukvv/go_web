@@ -38,7 +38,7 @@ func getOnePost(db *sql.DB, id string) ([]models.Post, error) {
 	res := make([]models.Post, 0, 1)
 	rows, err := db.Query(fmt.Sprintf("select * from blog_app.posts WHERE ID= %v", id))
 	if err != nil {
-		return res, err
+		return nil, err
 	}
 	defer rows.Close()
 

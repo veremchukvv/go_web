@@ -13,7 +13,6 @@ type BlogController struct {
 }
 
 func (blog *BlogController) Get() {
-
 	posts, err := getAllPosts(blog.Db)
 
 	if err != nil {
@@ -30,7 +29,8 @@ func getAllPosts(db *sql.DB) ([]models.Post, error) {
 	res := make([]models.Post, 0, 1)
 	rows, err := db.Query("select * from blog_app.posts")
 	if err != nil {
-		return res, err
+		log.Println(err)
+		return nil, err
 	}
 	defer rows.Close()
 
