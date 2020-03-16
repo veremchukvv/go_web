@@ -1,20 +1,27 @@
 package controllers
 
 import (
-	"database/sql"
+	"context"
 	"github.com/astaxie/beego"
-	"go_web/lesson5/blog-app/models"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go_web/lesson6/blog-app-mongo/models"
 	"log"
 )
 
 type BlogController struct {
 	beego.Controller
-	Db *sql.DB
+	Explorer Explorer
+}
+
+type Explorer struct {
+	Db     *mongo.Client
+	DbName string
 }
 
 func (blog *BlogController) Get() {
 
-	posts, err := getAllPosts(blog.Db)
+	posts, err := blog.Explorer.getAllPosts()
 
 	if err != nil {
 		blog.Ctx.ResponseWriter.WriteHeader(404)
@@ -26,22 +33,22 @@ func (blog *BlogController) Get() {
 
 }
 
-func getAllPosts(db *sql.DB) ([]models.Post, error) {
-	res := make([]models.Post, 0, 1)
-	rows, err := db.Query("select * from blog_app.posts")
+func (e Explorer) getAllPosts() ([]models.Post, error) {
+
+	posts := e.Db.Database(e.DbName).Collection("posts")
+	// log.Printf("Found %+v\n", posts)
+	cur, err := posts.Find(context.Background(), bson.D{})
 	if err != nil {
-		return res, err
+		log.Println("error!")
+		return nil, err
 	}
-	defer rows.Close()
-
-	for rows.Next() {
-		blog := models.Post{}
-		if err := rows.Scan(&blog.ID, &blog.Category, &blog.Title, &blog.Author, &blog.Text); err != nil {
-			log.Println(err)
-			continue
-		}
-		res = append(res, blog)
+	res := make([]models.Post, 0, 1)
+	if err := cur.All(context.Background(), &res); err != nil {
+		log.Println(err)
+		return nil, err
 	}
-
+	log.Println("smth")
+	log.Println(res)
 	return res, nil
+
 }
