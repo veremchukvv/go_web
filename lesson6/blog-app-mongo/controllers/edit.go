@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	// "fmt"
 	"github.com/astaxie/beego"
 	"go.mongodb.org/mongo-driver/bson"
 	"go_web/lesson6/blog-app-mongo/models"

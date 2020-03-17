@@ -47,10 +47,13 @@ func init() {
 		},
 	})
 
-	// beego.Router("/post/new", &controllers.NewController{
-	// 	Controller: beego.Controller{},
-	// 	Db:         db,
-	// })
+	beego.Router("/post/new", &controllers.NewController{
+		Controller: beego.Controller{},
+		Explorer: controllers.Explorer{
+			Db:     db,
+			DbName: dbName,
+		},
+	})
 
 	// beego.Router("/post/delete/", &controllers.DeleteController{
 	// 	Controller: beego.Controller{},
