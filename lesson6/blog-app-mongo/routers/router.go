@@ -55,9 +55,11 @@ func init() {
 		},
 	})
 
-	// beego.Router("/post/delete/", &controllers.DeleteController{
-	// 	Controller: beego.Controller{},
-	// 	Db:         db,
-	// })
-
+	beego.Router("/post/delete/", &controllers.DeleteController{
+		Controller: beego.Controller{},
+		Explorer: controllers.Explorer{
+			Db:     db,
+			DbName: dbName,
+		},
+	})
 }

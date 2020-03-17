@@ -1,23 +1,32 @@
 package controllers
 
 import (
-	"database/sql"
+	"context"
 	"github.com/astaxie/beego"
+	"go.mongodb.org/mongo-driver/bson"
 	"log"
 )
 
 type DeleteController struct {
 	beego.Controller
-	Db *sql.DB
+	Explorer Explorer
 }
 
 func (post *DeleteController) Get() {
 	id := post.Ctx.Request.URL.Query().Get("id")
 
-	_, err := post.Db.Exec("delete from blog_app.posts where id = ?", id)
+	if len(id) == 0 {
+		post.Ctx.ResponseWriter.WriteHeader(404)
+		_, _ = post.Ctx.ResponseWriter.Write([]byte("empty id"))
+		return
+	}
+
+	c := post.Explorer.Db.Database(post.Explorer.DbName).Collection("posts")
+	filter := bson.D{{Key: "ID", Value: id}}
+
+	_, err := c.DeleteOne(context.Background(), filter)
 	if err != nil {
 		log.Println(err)
 	}
 	post.Redirect("/", 302)
-
 }
