@@ -39,10 +39,13 @@ func init() {
 		},
 	})
 
-	// beego.Router("/post/edit/", &controllers.EditController{
-	// 	Controller: beego.Controller{},
-	// 	Db:         db,
-	// })
+	beego.Router("/post/edit/", &controllers.EditController{
+		Controller: beego.Controller{},
+		Explorer: controllers.Explorer{
+			Db:     db,
+			DbName: dbName,
+		},
+	})
 
 	// beego.Router("/post/new", &controllers.NewController{
 	// 	Controller: beego.Controller{},

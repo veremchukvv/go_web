@@ -1,16 +1,17 @@
 package controllers
 
 import (
-	"database/sql"
-	"fmt"
+	"context"
+	// "fmt"
 	"github.com/astaxie/beego"
-	"go_web/lesson5/blog-app/models"
+	"go.mongodb.org/mongo-driver/bson"
+	"go_web/lesson6/blog-app-mongo/models"
 	"log"
 )
 
 type EditController struct {
 	beego.Controller
-	Db *sql.DB
+	Explorer Explorer
 }
 
 func (post *EditController) Get() {
@@ -22,7 +23,7 @@ func (post *EditController) Get() {
 		return
 	}
 
-	editPost, err := getPostForEdit(post.Db, id)
+	editPost, err := post.Explorer.getPostForEdit(id)
 
 	if err != nil {
 		post.Ctx.ResponseWriter.WriteHeader(404)
@@ -35,36 +36,35 @@ func (post *EditController) Get() {
 }
 
 func (post *EditController) Post() {
-
 	id := post.GetString("id")
 	title := post.GetString("title")
 	author := post.GetString("author")
 	category := post.GetString("category")
 	text := post.GetString("text")
 
-	_, err := post.Db.Exec("update blog_app.posts set category_id=?, title=?, author=?, text=? where id = ?", category, title, author, text, id)
+	filter := bson.D{{Key: "ID", Value: id}}
+	update := bson.D{{Key: "Title", Value: title}, {Key: "Author", Value: author}, {Key: "Category", Value: category}, {Key: "Text", Value: text}}
+
+	update = bson.D{{Key: "$set", Value: update}}
+
+	c := post.Explorer.Db.Database(post.Explorer.DbName).Collection("posts")
+	_, err := c.UpdateOne(context.Background(), filter, update)
 	if err != nil {
 		log.Println(err)
 	}
+
 	post.Redirect("/", 302)
 }
 
-func getPostForEdit(db *sql.DB, id string) ([]models.Post, error) {
-	res := make([]models.Post, 0, 1)
-	rows, err := db.Query(fmt.Sprintf("select * from blog_app.posts WHERE ID= %v", id))
-	if err != nil {
-		return res, err
-	}
-	defer rows.Close()
+func (e Explorer) getPostForEdit(id string) (models.Post, error) {
+	c := e.Db.Database(e.DbName).Collection("posts")
+	filter := bson.D{{Key: "ID", Value: id}}
+	res := c.FindOne(context.Background(), filter)
 
-	for rows.Next() {
-		post := models.Post{}
-		if err := rows.Scan(&post.ID, &post.Category, &post.Title, &post.Author, &post.Text); err != nil {
-			log.Println(err)
-			continue
-		}
-		res = append(res, post)
+	post := new(models.Post)
+	if err := res.Decode(post); err != nil {
+		return models.Post{}, err
 	}
 
-	return res, nil
+	return *post, nil
 }

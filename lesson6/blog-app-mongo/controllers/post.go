@@ -2,12 +2,9 @@ package controllers
 
 import (
 	"context"
-	// "fmt"
 	"github.com/astaxie/beego"
 	"go.mongodb.org/mongo-driver/bson"
-	// "go.mongodb.org/mongo-driver/mongo"
 	"go_web/lesson6/blog-app-mongo/models"
-	"log"
 )
 
 type PostController struct {
