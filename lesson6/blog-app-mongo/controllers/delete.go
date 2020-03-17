@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/httplib"
 	"go.mongodb.org/mongo-driver/bson"
 	"log"
 )
@@ -12,7 +13,8 @@ type DeleteController struct {
 	Explorer Explorer
 }
 
-func (post *DeleteController) Get() {
+func (post *DeleteController) Delete() {
+
 	id := post.Ctx.Request.URL.Query().Get("id")
 
 	if len(id) == 0 {
