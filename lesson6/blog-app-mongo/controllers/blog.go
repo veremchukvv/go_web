@@ -20,7 +20,6 @@ type Explorer struct {
 }
 
 func (blog *BlogController) Get() {
-
 	posts, err := blog.Explorer.getAllPosts()
 
 	if err != nil {
@@ -34,12 +33,9 @@ func (blog *BlogController) Get() {
 }
 
 func (e Explorer) getAllPosts() ([]models.Post, error) {
-
 	posts := e.Db.Database(e.DbName).Collection("posts")
-	// log.Printf("Found %+v\n", posts)
 	cur, err := posts.Find(context.Background(), bson.D{})
 	if err != nil {
-		log.Println("error!")
 		return nil, err
 	}
 	res := make([]models.Post, 0, 1)
@@ -47,8 +43,5 @@ func (e Explorer) getAllPosts() ([]models.Post, error) {
 		log.Println(err)
 		return nil, err
 	}
-	log.Println("smth")
-	log.Println(res)
 	return res, nil
-
 }

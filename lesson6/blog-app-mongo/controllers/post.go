@@ -1,16 +1,18 @@
 package controllers
 
 import (
-	"database/sql"
-	"fmt"
+	"context"
+	// "fmt"
 	"github.com/astaxie/beego"
-	"go_web/lesson5/blog-app/models"
+	"go.mongodb.org/mongo-driver/bson"
+	// "go.mongodb.org/mongo-driver/mongo"
+	"go_web/lesson6/blog-app-mongo/models"
 	"log"
 )
 
 type PostController struct {
 	beego.Controller
-	Db *sql.DB
+	Explorer Explorer
 }
 
 func (post *PostController) Get() {
@@ -22,7 +24,7 @@ func (post *PostController) Get() {
 		return
 	}
 
-	getPost, err := getOnePost(post.Db, id)
+	getPost, err := post.Explorer.getOnePost(id)
 
 	if err != nil {
 		post.Ctx.ResponseWriter.WriteHeader(404)
@@ -34,22 +36,15 @@ func (post *PostController) Get() {
 
 }
 
-func getOnePost(db *sql.DB, id string) ([]models.Post, error) {
-	res := make([]models.Post, 0, 1)
-	rows, err := db.Query(fmt.Sprintf("select * from blog_app.posts WHERE ID= %v", id))
-	if err != nil {
-		return res, err
-	}
-	defer rows.Close()
+func (e Explorer) getOnePost(id string) (models.Post, error) {
+	c := e.Db.Database(e.DbName).Collection("posts")
+	filter := bson.D{{Key: "ID", Value: id}}
+	res := c.FindOne(context.Background(), filter)
 
-	for rows.Next() {
-		post := models.Post{}
-		if err := rows.Scan(&post.ID, &post.Category, &post.Title, &post.Author, &post.Text); err != nil {
-			log.Println(err)
-			continue
-		}
-		res = append(res, post)
+	post := new(models.Post)
+	if err := res.Decode(post); err != nil {
+		return models.Post{}, err
 	}
 
-	return res, nil
+	return *post, nil
 }

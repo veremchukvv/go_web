@@ -31,10 +31,13 @@ func init() {
 		},
 	})
 
-	// beego.Router("/post", &controllers.PostController{
-	// 	Controller: beego.Controller{},
-	// 	Db:         db,
-	// })
+	beego.Router("/post", &controllers.PostController{
+		Controller: beego.Controller{},
+		Explorer: controllers.Explorer{
+			Db:     db,
+			DbName: dbName,
+		},
+	})
 
 	// beego.Router("/post/edit/", &controllers.EditController{
 	// 	Controller: beego.Controller{},
