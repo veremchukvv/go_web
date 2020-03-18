@@ -21,15 +21,12 @@ type Explorer struct {
 
 func (blog *BlogController) Get() {
 	posts, err := blog.Explorer.getAllPosts()
-
 	if err != nil {
 		blog.Ctx.ResponseWriter.WriteHeader(404)
 		return
 	}
-
 	blog.Data["Post"] = posts
 	blog.TplName = "blog.tpl"
-
 }
 
 func (e Explorer) getAllPosts() ([]models.Post, error) {
