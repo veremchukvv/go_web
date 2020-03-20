@@ -1,0 +1,17 @@
+slon@slon-VirtualBox:~/work/src/go_web/lesson6/blog-app-mongo/tests$ go test -v
+2020/03/20 14:04:35 Database connection OK
+=== RUN   TestBlogLoadOK
+
+  Subject: Test Station Endpoint
+ 
+    Status Code Should Be 200 ✔
+    The Result Should Not Be Empty ✔
+
+
+2 total assertions
+
+--- PASS: TestBlogLoadOK (0.05s)
+=== RUN   TestPostLoadOK
+--- PASS: TestPostLoadOK (0.01s)
+PASS
+ok      go_web/lesson6/blog-app-mongo/tests     0.154s
