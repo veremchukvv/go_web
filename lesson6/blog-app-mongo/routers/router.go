@@ -11,7 +11,7 @@ import (
 
 const dbName = "blog_app"
 
-func init() {
+func init() { // цикломатическая сложность функции = 3
 	db, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
 	if err != nil {
 		log.Fatal(err)
@@ -55,9 +55,12 @@ func init() {
 		},
 	})
 
-	// beego.Router("/post/delete/", &controllers.DeleteController{
-	// 	Controller: beego.Controller{},
-	// 	Db:         db,
-	// })
+	beego.Router("/post/delete/", &controllers.DeleteController{
+		Controller: beego.Controller{},
+		Explorer: controllers.Explorer{
+			Db:     db,
+			DbName: dbName,
+		},
+	})
 
 }

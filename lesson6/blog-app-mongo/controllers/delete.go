@@ -11,7 +11,7 @@ type DeleteController struct {
 	Db *sql.DB
 }
 
-func (post *DeleteController) Get() {
+func (post *DeleteController) Get() { // цикломатическая сложность функции = 2
 	id := post.Ctx.Request.URL.Query().Get("id")
 
 	_, err := post.Db.Exec("delete from blog_app.posts where id = ?", id)
@@ -19,5 +19,4 @@ func (post *DeleteController) Get() {
 		log.Println(err)
 	}
 	post.Redirect("/", 302)
-
 }

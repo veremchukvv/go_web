@@ -12,7 +12,7 @@ type PostController struct {
 	Explorer Explorer
 }
 
-func (post *PostController) Get() {
+func (post *PostController) Get() { // цикломатическая сложность функции = 3
 	id := post.Ctx.Request.URL.Query().Get("id")
 
 	if len(id) == 0 {
@@ -33,7 +33,7 @@ func (post *PostController) Get() {
 
 }
 
-func (e Explorer) getOnePost(id string) (models.Post, error) {
+func (e Explorer) getOnePost(id string) (models.Post, error) { // цикломатическая сложность функции = 2
 	c := e.Db.Database(e.DbName).Collection("posts")
 	filter := bson.D{{Key: "ID", Value: id}}
 	res := c.FindOne(context.Background(), filter)

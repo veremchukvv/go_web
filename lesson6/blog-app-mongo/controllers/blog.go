@@ -19,20 +19,18 @@ type Explorer struct {
 	DbName string
 }
 
-func (blog *BlogController) Get() {
+func (blog *BlogController) Get() { // цикломатическая сложность функции = 2
 	posts, err := blog.Explorer.getAllPosts()
 
 	if err != nil {
 		blog.Ctx.ResponseWriter.WriteHeader(404)
 		return
 	}
-
 	blog.Data["Post"] = posts
 	blog.TplName = "blog.tpl"
-
 }
 
-func (e Explorer) getAllPosts() ([]models.Post, error) {
+func (e Explorer) getAllPosts() ([]models.Post, error) { // цикломатическая сложность функции = 3
 	posts := e.Db.Database(e.DbName).Collection("posts")
 	cur, err := posts.Find(context.Background(), bson.D{})
 	if err != nil {

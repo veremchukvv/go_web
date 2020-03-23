@@ -13,8 +13,7 @@ type TestCase struct {
 	StatusCode int
 }
 
-func TestPostLoadOK(t *testing.T) {
-
+func TestPostLoadOK(t *testing.T) { // цикломатическая сложность функции = 3
 	for caseNum, item := range createCases() {
 		r := httptest.NewRequest("GET", "/post?id="+item.id, nil)
 		w := httptest.NewRecorder()
@@ -27,7 +26,7 @@ func TestPostLoadOK(t *testing.T) {
 	}
 }
 
-func createCases() []TestCase {
+func createCases() []TestCase { // цикломатическая сложность функции = 1
 	return []TestCase{
 		{
 			id:         "1",

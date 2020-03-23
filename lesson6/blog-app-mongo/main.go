@@ -6,6 +6,6 @@ import (
 	"os"
 )
 
-func main() {
+func main() { // цикломатическая сложность функции = 1
 	beego.Run("localhost:" + os.Getenv("httpport"))
 }

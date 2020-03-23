@@ -13,7 +13,7 @@ type EditController struct {
 	Explorer Explorer
 }
 
-func (post *EditController) Get() {
+func (post *EditController) Get() { // цикломатическая сложность функции = 3
 	id := post.Ctx.Request.URL.Query().Get("id")
 
 	if len(id) == 0 {
@@ -34,7 +34,7 @@ func (post *EditController) Get() {
 
 }
 
-func (post *EditController) Post() {
+func (post *EditController) Post() { // цикломатическая сложность функции = 2
 	id := post.GetString("id")
 	title := post.GetString("title")
 	author := post.GetString("author")
@@ -55,7 +55,7 @@ func (post *EditController) Post() {
 	post.Redirect("/", 302)
 }
 
-func (e Explorer) getPostForEdit(id string) (models.Post, error) {
+func (e Explorer) getPostForEdit(id string) (models.Post, error) { // цикломатическая сложность функции = 2
 	c := e.Db.Database(e.DbName).Collection("posts")
 	filter := bson.D{{Key: "ID", Value: id}}
 	res := c.FindOne(context.Background(), filter)
